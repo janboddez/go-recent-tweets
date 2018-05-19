@@ -77,7 +77,7 @@ class GO_Recent_Tweets_Widget extends WP_Widget {
 								'rel="nofollow"',
 								'rel="nofollow noopener"',
 								preg_replace(
-									'/(<a\\b[^<>]*href=[\'"]?http[^<>]+)>/is',
+									'/(<a\b[^<>]*href=[\'"]?http[^<>]+)>/is',
 									'$1 target="_blank">',
 									make_clickable(
 										preg_replace(

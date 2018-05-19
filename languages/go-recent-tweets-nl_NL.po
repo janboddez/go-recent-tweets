@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: GO Recent Tweets\n"
-"POT-Creation-Date: 2018-05-19 17:43+0200\n"
-"PO-Revision-Date: 2018-05-19 17:46+0200\n"
+"POT-Creation-Date: 2018-05-19 23:14+0200\n"
+"PO-Revision-Date: 2018-05-19 23:14+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: nl_NL\n"
@@ -16,39 +16,68 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: languages\n"
 
-#: go-recent-tweets.php:23 go-recent-tweets.php:89 go-recent-tweets.php:142
-#: go-recent-tweets.php:143 go-recent-tweets.php:166
+#: go-recent-tweets.php:36 go-recent-tweets.php:120 go-recent-tweets.php:191
+#: go-recent-tweets.php:192 go-recent-tweets.php:232
 msgid "Recent Tweets"
 msgstr "Recente tweets"
 
-#: go-recent-tweets.php:24
+#: go-recent-tweets.php:37
 msgid "Retrieve, cache (!) and display your most recent tweets."
 msgstr "Haal je meest recente tweets op, cache ze, en toon ze op je website."
 
-#: go-recent-tweets.php:93
+#: go-recent-tweets.php:95
+#, php-format
+msgid "On %s"
+msgstr "Op %s"
+
+#: go-recent-tweets.php:125
 msgid "Title:"
 msgstr "Titel:"
 
-#: go-recent-tweets.php:172
+#: go-recent-tweets.php:238
 msgid "Twitter OAuth Access Token"
 msgstr "Twitter OAuth Access Token"
 
-#: go-recent-tweets.php:176
+#: go-recent-tweets.php:242
 msgid "Twitter OAuth Access Token Secret"
 msgstr "Twitter OAuth Access Token Secret"
 
-#: go-recent-tweets.php:180
+#: go-recent-tweets.php:246
 msgid "Twitter API Consumer Key"
 msgstr "Twitter API Consumer Key"
 
-#: go-recent-tweets.php:184
+#: go-recent-tweets.php:250
 msgid "Twitter API Consumer Secret"
-msgstr "Twitter API Consumer Key"
+msgstr "Twitter API Consumer Secret"
 
-#: go-recent-tweets.php:188
+#: go-recent-tweets.php:254
 msgid "Twitter username"
 msgstr "Twitter-gebruikersnaam"
 
-#: go-recent-tweets.php:192
+#: go-recent-tweets.php:258
 msgid "Number of tweets to display"
 msgstr "Aantal tweets dat moet worden weergegeven"
+
+#: go-recent-tweets.php:262
+msgid "Include retweets?"
+msgstr "Ook retweets weergeven?"
+
+#: go-recent-tweets.php:264
+msgid "Yes"
+msgstr "Ja"
+
+#: go-recent-tweets.php:265
+msgid "No"
+msgstr "Nee"
+
+#: go-recent-tweets.php:270
+msgid "Save Settings"
+msgstr "Instellingen opslaan"
+
+#: go-recent-tweets.php:271
+msgid "Clear Cache"
+msgstr "Cache legen"
+
+#: go-recent-tweets.php:347
+msgid "Cache cleared!"
+msgstr "Cache geleegd!"

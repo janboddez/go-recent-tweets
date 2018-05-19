@@ -71,11 +71,31 @@ class GO_Recent_Tweets_Widget extends WP_Widget {
 					<?php foreach( $tweets as $tweet ) : ?>
 					<li>
 						<p class="tweet-text">
-							<?php echo wptexturize( $tweet['text'] ); ?>
+							<?php
+							/* Fairly convoluted way of making both usernames and in-tweet links clickable and open in a new tab. */
+							echo str_replace(
+								'rel="nofollow"',
+								'rel="nofollow noopener"',
+								preg_replace(
+									'/(<a\\b[^<>]*href=[\'"]?http[^<>]+)>/is',
+									'$1 target="_blank">',
+									make_clickable(
+										preg_replace(
+											'/(^|[^a-z0-9_])@([a-z0-9_]+)/i',
+											'$1<a href="https://twitter.com/$2" rel="noopener">@$2</a>',
+											wptexturize( $tweet['text'] )
+										)
+									)
+								)
+							); ?>
 						</p>
 						<time class="tweet-meta">
-							On <a href="<?php echo esc_url( $tweet['uri'] ); ?>" target="_blank" rel="noopener"><?php echo date_i18n( get_option( 'date_format' ), strtotime( $tweet['created_at'] ) ); ?></a>
-						<time>
+							<?php
+							echo sprintf(
+								__( 'On %s', 'go-recent-tweets' ),
+								'<a href="' . esc_url( $tweet['uri'] ) .'" target="_blank" rel="noopener">' . date_i18n( get_option( 'date_format' ), strtotime( $tweet['created_at'] ) ) . '</a>'
+							); ?>
+						</time>
 					</li>
 					<?php endforeach; ?>
 				</ul>
@@ -241,14 +261,14 @@ class GO_Recent_Tweets {
 					<tr valign="top">
 						<th scope="row"><?php _e( 'Include retweets?', 'go-recent-tweets' ); ?></th>
 						<td>
-							<input type="radio" name="go_recent_tweets_incl_rts" value="1" <?php checked( 1, get_option( 'go_recent_tweets_incl_rts' ), true ); ?>><?php _e( 'Yes', 'go-recent-tweets' ); ?><br />
-							<input type="radio" name="go_recent_tweets_incl_rts" value="0" <?php checked( 0, get_option( 'go_recent_tweets_incl_rts' ), true ); ?>><?php _e( 'No', 'go-recent-tweets' ); ?>
+							<input type="radio" name="go_recent_tweets_incl_rts" id="go_recent_tweets_incl_rts_y" value="1" <?php checked( 1, get_option( 'go_recent_tweets_incl_rts' ), true ); ?>><label for="go_recent_tweets_incl_rts_y"><?php _e( 'Yes', 'go-recent-tweets' ); ?></label><br />
+							<input type="radio" name="go_recent_tweets_incl_rts" id="go_recent_tweets_incl_rts_n" value="0" <?php checked( 0, get_option( 'go_recent_tweets_incl_rts' ), true ); ?>><label for="go_recent_tweets_incl_rts_n"><?php _e( 'No', 'go-recent-tweets' ); ?></label>
 						</td>
 					</tr>
 				</table>
 				<p class="submit">
 					<?php submit_button( __( 'Save Settings', 'go-recent-tweets' ), 'primary', 'submit', false ); ?>
-					<input type="button" name="go_recent_tweets_clear_cache" id="go_recent_tweets_clear_cache" class="button" value="Clear Cache" />
+					<input type="button" name="go_recent_tweets_clear_cache" id="go_recent_tweets_clear_cache" class="button" value="<?php _e( 'Clear Cache', 'go-recent-tweets' ); ?>" />
 				</p>
 			</form>
 		</div>
@@ -275,7 +295,7 @@ class GO_Recent_Tweets {
 		$twitter_username = urlencode( get_option( 'go_recent_tweets_username' ) );
 		$max_no = (int) get_option( 'go_recent_tweets_max_no' );
 		$incl_rts = (int) get_option( 'go_recent_tweets_incl_rts' );
-		$num_tweets = $max_no + 10; // So as to grab a couple extra
+		$num_tweets = $max_no + 10; // So as to grab a couple extra.
 
 		$url = 'https://api.twitter.com/1.1/statuses/user_timeline.json';
 		$getfield = '?screen_name=' . $twitter_username . '&count=' . $num_tweets . '&include_rts=' . $incl_rts;
@@ -300,7 +320,7 @@ class GO_Recent_Tweets {
 					);
 
 					if ( count( $tweets ) >= $max_no ) {
-						break; // Break out of the loop
+						break; // Break out of the loop.
 					}
 				}
 			}
@@ -324,7 +344,7 @@ class GO_Recent_Tweets {
 	 */
 	public function delete_tweets() {
 		delete_transient( 'go_recent_tweets' );
-		//echo 'Cleared!';
+		_e( 'Cache cleared!', 'go-recent-tweets' );
 		wp_die();
 	}
 

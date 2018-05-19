@@ -5,7 +5,7 @@ jQuery( function( $ ) {
 		};
 
 		$.post( ajaxurl, data, function( response ) {
-			//alert( response );
+			alert( response );
 		} );
 	} );
 } );

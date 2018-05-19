@@ -1,0 +1,54 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: GO Recent Tweets\n"
+"POT-Creation-Date: 2018-05-19 17:43+0200\n"
+"PO-Revision-Date: 2018-05-19 17:46+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: nl_BE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.7.1\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: languages\n"
+
+#: go-recent-tweets.php:23 go-recent-tweets.php:89 go-recent-tweets.php:142
+#: go-recent-tweets.php:143 go-recent-tweets.php:166
+msgid "Recent Tweets"
+msgstr "Recente tweets"
+
+#: go-recent-tweets.php:24
+msgid "Retrieve, cache (!) and display your most recent tweets."
+msgstr "Haal je meest recente tweets op, cache ze, en toon ze op je website."
+
+#: go-recent-tweets.php:93
+msgid "Title:"
+msgstr "Titel:"
+
+#: go-recent-tweets.php:172
+msgid "Twitter OAuth Access Token"
+msgstr "Twitter OAuth Access Token"
+
+#: go-recent-tweets.php:176
+msgid "Twitter OAuth Access Token Secret"
+msgstr "Twitter OAuth Access Token Secret"
+
+#: go-recent-tweets.php:180
+msgid "Twitter API Consumer Key"
+msgstr "Twitter API Consumer Key"
+
+#: go-recent-tweets.php:184
+msgid "Twitter API Consumer Secret"
+msgstr "Twitter API Consumer Key"
+
+#: go-recent-tweets.php:188
+msgid "Twitter username"
+msgstr "Twitter-gebruikersnaam"
+
+#: go-recent-tweets.php:192
+msgid "Number of tweets to display"
+msgstr "Aantal tweets dat moet worden weergegeven"

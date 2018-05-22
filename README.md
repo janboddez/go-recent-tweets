@@ -10,4 +10,4 @@ Copy-paste (from the Twitter Application management screen) your consumer API ke
 
 Now, within WordPress, head over to Appearance > Widgets and add a Recent Tweets widget to any sidebar or widgetized area. Feel free to rename the widget (or even fully remove its title). That's it!
 
-If you ever want to change these settings or somehow force-refresh the list of tweets on your WordPress site (after you've removed an embarrassing tweet, perhaps), simply use the 'Clear Cache' button. Tweets are cached for 12 hours, after all (in order to speed up your site's load time).
+If you ever change these settings or somehow want force-refresh the list of tweets on your WordPress site (after you've removed an embarrassing tweet, perhaps), simply use the 'Clear Cache' button. Tweets are cached for 12 hours, after all (in order to speed up your site's load time).

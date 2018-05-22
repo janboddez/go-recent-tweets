@@ -2,7 +2,7 @@
 Add a 'Recent Tweets' widget to your WordPress website. Uses the most recent Twitter API to retrieve recent (re)tweets, then caches them in order to reduce server load.
 
 ## Installation
-Download the zip file and unpack into @wp-content/plugins/@. Go to https://apps.twitter.com/, log in with your Twitter username and password, and choose 'Create New App'. Fill out the form and hit 'Create your Twitter application'.
+Download the zip file and unpack into `wp-content/plugins/`. Go to https://apps.twitter.com/, log in with your Twitter username and password, and choose 'Create New App'. Fill out the form and hit 'Create your Twitter application'.
 
 After doing so, click the newly created app and go to the 'Keys and Access Tokens' tab. At the same time, open up the admin section of your WordPress installation and navigate to Settings > Recent Tweets.
 

@@ -269,8 +269,8 @@ class GO_Recent_Tweets {
 				<?php
 				$options = get_option( 'go_recent_tweets_settings', false );
 
-				if ( ! $options ) {
-					// If this form gets called before any settings were ever saved.
+				if ( false === $options ) {
+					// Should this form get called before any settings were ever saved.
 					$options = array(
 						'api_oauth_access_token' => '',
 						'api_oauth_access_token_secret' => '',
@@ -328,6 +328,17 @@ class GO_Recent_Tweets {
 	}
 
 	/**
+	 * Deletes the saved tweet list.
+	 *
+	 * @since 0.1.0
+	 */
+	public function delete_tweets() {
+		delete_transient( 'go_recent_tweets' );
+		_e( 'Cache cleared!', 'go-recent-tweets' );
+		wp_die();
+	}
+
+	/**
 	 * Updates the list of tweets by calling the Twitter API.
 	 *
 	 * @since 0.1.0
@@ -337,8 +348,8 @@ class GO_Recent_Tweets {
 		require_once dirname( __FILE__ ) . '/vendor/twitter-api-php/TwitterAPIExchange.php';
 		$options = get_option( 'go_recent_tweets_settings', false );
 
-		if ( ! $options ) {
-			// If this method gets called before any settings were ever saved.
+		if ( false === $options ) {
+			// Should this method get called before any settings were ever saved.
 			$options = array(
 				'api_oauth_access_token' => '',
 				'api_oauth_access_token_secret' => '',
@@ -389,21 +400,10 @@ class GO_Recent_Tweets {
 		}
 
 		if ( isset( $json['errors'][0]['message'] ) ) {
-			(new self)->error_log( $json['errors'][0]['message'] );
+			self::error_log( $json['errors'][0]['message'] );
 		}
 
 		return false;
-	}
-
-	/**
-	 * Deletes the saved tweet list.
-	 *
-	 * @since 0.1.0
-	 */
-	public function delete_tweets() {
-		delete_transient( 'go_recent_tweets' );
-		_e( 'Cache cleared!', 'go-recent-tweets' );
-		wp_die();
 	}
 
 	/**
@@ -413,7 +413,7 @@ class GO_Recent_Tweets {
 	 * @since 0.1.0
 	 * @param string $message The (error) message to be logged.
 	 */
-	public function error_log( $message ) {
+	public static function error_log( $message ) {
 		if ( true === WP_DEBUG_LOG ) {
 			error_log( date_i18n( 'Y-m-d H:i:s' ) . ' ' . $message . PHP_EOL, 3, dirname( __FILE__ ) . '/debug.log' );
 		}

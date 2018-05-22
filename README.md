@@ -6,7 +6,7 @@ Download the zip file and unpack into `wp-content/plugins/`. Head over to https:
 
 After doing so, click the newly created app and go to the 'Keys and Access Tokens' tab. At the same time, open up the admin section of your WordPress installation and navigate to Settings > Recent Tweets.
 
-Copy-paste (from the Twitter Application management screen) your consumer API key and secret as well as your access token and access token secret into the relevant fields on the WordPress Recent Tweets settings page. Fill out your Twitter username and the other options, too. Hit 'Save Changes'.
+Copy-paste (from the Twitter Application management screen) your consumer API key and secret as well as your access token and access token secret into the relevant fields on the Recent Tweets settings page. Fill out your Twitter username and the other options, too. Hit 'Save Changes'.
 
 Now, within WordPress, head over to Appearance > Widgets and add a Recent Tweets widget to any sidebar or widgetized area. Feel free to rename the widget (or even fully remove its title). That's it!
 

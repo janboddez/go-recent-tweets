@@ -1,5 +1,5 @@
 jQuery( function( $ ) {
-	$( '#go_recent_tweets_clear_cache' ).click( function() {
+	$( '#go-recent-tweets-clear-cache' ).click( function() {
 		var data = {
 			'action': 'go_recent_tweets_clear_cache'
 		};

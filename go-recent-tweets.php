@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: GO Recent Tweets
+ * Plugin Name: GO Recent Tweets Widget
  * Plugin URI: https://janboddez.be/
  * Description: Retrieve, cache and display your most recent tweets.
  * Author: Jan Boddez
@@ -70,32 +70,12 @@ class GO_Recent_Tweets_Widget extends WP_Widget {
 				<ul>
 					<?php foreach( $tweets as $tweet ) : ?>
 					<li>
-						<p class="tweet-text">
-							<?php
-							/* Fairly convoluted way of making both usernames and in-tweet links clickable and open in a new tab. */
-							echo str_replace(
-								'rel="nofollow"',
-								'rel="nofollow noopener"',
-								preg_replace(
-									'/(<a\b[^<>]*href=[\'"]?http[^<>]+)>/is',
-									'$1 target="_blank">',
-									make_clickable(
-										preg_replace(
-											'/(^|[^a-z0-9_])@([a-z0-9_]+)/i',
-											'$1<a href="https://twitter.com/$2" rel="noopener">@$2</a>',
-											wptexturize( $tweet['text'] )
-										)
-									)
-								)
-							); ?>
-						</p>
-						<time class="tweet-meta">
-							<?php
-							echo sprintf(
-								__( 'On %s', 'go-recent-tweets' ),
-								'<a href="' . esc_url( $tweet['uri'] ) .'" target="_blank" rel="noopener">' . date_i18n( get_option( 'date_format' ), strtotime( $tweet['created_at'] ) ) . '</a>'
-							); ?>
-						</time>
+						<div class="tweet-content">
+							<?php echo $this->make_links_clickable( $tweet['text'] ); ?>
+						</div>
+						<div class="tweet-meta">
+							<small><time><?php echo sprintf( __( 'On %s', 'go-recent-tweets' ), '<a href="' . esc_url( $tweet['uri'] ) .'" target="_blank" rel="noopener">' . date_i18n( get_option( 'date_format' ), strtotime( $tweet['created_at'] ) ) . '</a>' ); ?></time></small>
+						</div>
 					</li>
 					<?php endforeach; ?>
 				</ul>
@@ -125,7 +105,7 @@ class GO_Recent_Tweets_Widget extends WP_Widget {
 			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:', 'go-recent-tweets' ); ?></label> 
 			<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
 		</p>
-		<?php 
+		<?php
 	}
 
 	/**
@@ -141,6 +121,26 @@ class GO_Recent_Tweets_Widget extends WP_Widget {
 		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? sanitize_text_field( $new_instance['title'] ) : '';
 
 		return $instance;
+	}
+
+	/**
+	 * Turns Twitter handles and in-tweet URIs into hyperlinks.
+	 *
+	 * @since 0.1.0
+	 * @param string $text Text that may or may not contain Twitter handles and URLS.
+	 * @return string Text containing actual HTML hyperlinks, if applicable.
+	 */
+	public function make_links_clickable( $text = '', $new_tab = true ) {
+		$text = wptexturize( $text );
+		$text = preg_replace( '/(^|[^a-z0-9_])@([a-z0-9_]+)/i', '$1<a href="https://twitter.com/$2" rel="nofollow">@$2</a>', $text );
+		$text = make_clickable( $text ); // Will add 'rel="nofollow"' by default.
+
+		if ( $new_tab ) {
+			$text = preg_replace( '/(<a\b[^<>]*href=[\'"]?http[^<>]+)>/is', '$1 target="_blank">', $text );
+			$text = str_replace( 'rel="nofollow"', 'rel="nofollow noopener"', $text );
+		}
+
+		return $text;
 	}
 }
 endif;
@@ -212,13 +212,48 @@ class GO_Recent_Tweets {
 	 * @since 0.1.0
 	 */
 	public function register_settings() {
-		register_setting( 'go-recent-tweets-settings-group', 'go_recent_tweets_api_oauth_access_token', 'wp_sanitize_text_field' );
-		register_setting( 'go-recent-tweets-settings-group', 'go_recent_tweets_api_oauth_access_token_secret', 'wp_sanitize_text_field' );
-		register_setting( 'go-recent-tweets-settings-group', 'go_recent_tweets_api_consumer_key', 'wp_sanitize_text_field' );
-		register_setting( 'go-recent-tweets-settings-group', 'go_recent_tweets_api_consumer_secret', 'wp_sanitize_text_field' );
-		register_setting( 'go-recent-tweets-settings-group', 'go_recent_tweets_username', 'wp_sanitize_textfield' );
-		register_setting( 'go-recent-tweets-settings-group', 'go_recent_tweets_max_no', 'intval' );
-		register_setting( 'go-recent-tweets-settings-group', 'go_recent_tweets_incl_rts', 'intval' );
+		register_setting( 'go-recent-tweets-settings-group', 'go_recent_tweets_settings', array( 'sanitize_callback' => array( $this, 'sanitize_settings' ) ) );
+	}
+
+	/**
+	 * Sanitizes submitted options.
+	 *
+	 * @since 0.1.0
+	 * @param array $settings Settings as input by the user.
+	 * @return array Settings to save to the database.
+	 */
+	public function sanitize_settings( $settings ) {
+		$options = get_option( 'go_recent_tweets_settings', array() );
+
+		if ( isset( $settings['api_oauth_access_token'] ) ) {
+			$options['api_oauth_access_token'] = sanitize_text_field( $settings['api_oauth_access_token'] );
+		}
+
+		if ( isset( $settings['api_oauth_access_token_secret'] ) ) {
+			$options['api_oauth_access_token_secret'] = sanitize_text_field( $settings['api_oauth_access_token_secret'] );
+		}
+
+		if ( isset( $settings['api_consumer_key'] ) ) {
+			$options['api_consumer_key'] = sanitize_text_field( $settings['api_consumer_key'] );
+		}
+
+		if ( isset( $settings['api_consumer_secret'] ) ) {
+			$options['api_consumer_secret'] = sanitize_text_field( $settings['api_consumer_secret'] );
+		}
+
+		if ( isset( $settings['username'] ) ) {
+			$options['username'] = sanitize_text_field( $settings['username'] );
+		}
+
+		if ( isset( $settings['max_no'] ) ) {
+			$options['max_no'] = intval( $settings['max_no'] );
+		}
+
+		if ( isset( $settings['incl_rts'] ) ) {
+			$options['incl_rts'] = intval( $settings['incl_rts'] );
+		}
+
+		return $options;
 	}
 
 	/**
@@ -231,44 +266,61 @@ class GO_Recent_Tweets {
 		<div class="wrap">
 			<h1><?php _e( 'Recent Tweets', 'go-recent-tweets' ); ?></h1>
 			<form method="post" action="options.php">
-				<?php settings_fields( 'go-recent-tweets-settings-group' ); ?>
-				<?php do_settings_sections( 'go-recent-tweets-settings-group' ); ?>
+				<?php
+				$options = get_option( 'go_recent_tweets_settings', false );
+
+				if ( ! $options ) {
+					// If this form gets called before any settings were ever saved.
+					$options = array(
+						'api_oauth_access_token' => '',
+						'api_oauth_access_token_secret' => '',
+						'api_consumer_key' => '',
+						'api_consumer_secret' => '',
+						'username' => '',
+						'max_no' => 10,
+						'incl_rts' => '1',
+					);
+				}
+
+				settings_fields( 'go-recent-tweets-settings-group' );
+				do_settings_sections( 'go-recent-tweets-settings-group' );
+				?>
 				<table class="form-table">
 					<tr valign="top">
-						<th scope="row"><?php _e( 'Twitter OAuth Access Token', 'go-recent-tweets' ); ?></th>
-						<td><input type="text" name="go_recent_tweets_api_oauth_access_token" value="<?php echo esc_attr( get_option( 'go_recent_tweets_api_oauth_access_token' ) ); ?>" /></td>
+						<th scope="row"><label for="go_recent_tweets_settings[api_oauth_access_token]"><?php _e( 'Twitter OAuth Access Token', 'go-recent-tweets' ); ?></label></th>
+						<td><input type="text" id="go_recent_tweets_settings[api_oauth_access_token]" name="go_recent_tweets_settings[api_oauth_access_token]" value="<?php echo esc_attr( $options['api_oauth_access_token'] ); ?>" /></td>
 					</tr>
 					<tr valign="top">
-						<th scope="row"><?php _e( 'Twitter OAuth Access Token Secret', 'go-recent-tweets' ); ?></th>
-						<td><input type="text" name="go_recent_tweets_api_oauth_access_token_secret" value="<?php echo esc_attr( get_option( 'go_recent_tweets_api_oauth_access_token_secret' ) ); ?>" /></td>
+						<th scope="row"><label for="go_recent_tweets_settings[api_oauth_access_token_secret]"><?php _e( 'Twitter OAuth Access Token Secret', 'go-recent-tweets' ); ?></label></th>
+						<td><input type="text" id="go_recent_tweets_settings[api_oauth_access_token_secret]" name="go_recent_tweets_settings[api_oauth_access_token_secret]" value="<?php echo esc_attr( $options['api_oauth_access_token_secret'] ); ?>" /></td>
 					</tr>
 					<tr valign="top">
-						<th scope="row"><?php _e( 'Twitter API Consumer Key', 'go-recent-tweets' ); ?></th>
-						<td><input type="text" name="go_recent_tweets_api_consumer_key" value="<?php echo esc_attr( get_option( 'go_recent_tweets_api_consumer_key' ) ); ?>" /></td>
+						<th scope="row"><label for="go_recent_tweets_settings[api_consumer_key]"><?php _e( 'Twitter API Consumer Key', 'go-recent-tweets' ); ?></label></th>
+						<td><input type="text" id="go_recent_tweets_settings[api_consumer_key]" name="go_recent_tweets_settings[api_consumer_key]" value="<?php echo esc_attr( $options['api_consumer_key'] ); ?>" /></td>
 					</tr>
 					<tr valign="top">
-						<th scope="row"><?php _e( 'Twitter API Consumer Secret', 'go-recent-tweets' ); ?></th>
-						<td><input type="text" name="go_recent_tweets_api_consumer_secret" value="<?php echo esc_attr( get_option( 'go_recent_tweets_api_consumer_secret' ) ); ?>" /></td>
+						<th scope="row"><label for="go_recent_tweets_settings[api_consumer_secret]"><?php _e( 'Twitter API Consumer Secret', 'go-recent-tweets' ); ?></label></th>
+						<td><input type="text" id="go_recent_tweets_settings[api_consumer_secret]" name="go_recent_tweets_settings[api_consumer_secret]" value="<?php echo esc_attr( $options['api_consumer_secret'] ); ?>" /></td>
 					</tr>
 					<tr valign="top">
-						<th scope="row"><?php _e( 'Twitter username', 'go-recent-tweets' ); ?></th>
-						<td><input type="text" name="go_recent_tweets_username" value="<?php echo esc_attr( get_option( 'go_recent_tweets_username' ) ); ?>" /></td>
+						<th scope="row"><label for="go_recent_tweets_settings[username]"><?php _e( 'Twitter username', 'go-recent-tweets' ); ?></label></th>
+						<td><input type="text" id="go_recent_tweets_settings[username]" name="go_recent_tweets_settings[username]" value="<?php echo esc_attr( $options['username'] ); ?>" /></td>
 					</tr>
 					<tr valign="top">
-						<th scope="row"><?php _e( 'Number of tweets to display', 'go-recent-tweets' ); ?></th>
-						<td><input type="text" name="go_recent_tweets_max_no" value="<?php echo esc_attr( get_option( 'go_recent_tweets_max_no' ) ); ?>" /></td>
+						<th scope="row"><label for="go_recent_tweets_settings[max_no]"><?php _e( 'Number of tweets to display', 'go-recent-tweets' ); ?></label></th>
+						<td><input type="text" id="go_recent_tweets_settings[max_no]" name="go_recent_tweets_settings[max_no]" value="<?php echo esc_attr( $options['max_no'] ); ?>" /></td>
 					</tr>
 					<tr valign="top">
 						<th scope="row"><?php _e( 'Include retweets?', 'go-recent-tweets' ); ?></th>
 						<td>
-							<input type="radio" name="go_recent_tweets_incl_rts" id="go_recent_tweets_incl_rts_y" value="1" <?php checked( 1, get_option( 'go_recent_tweets_incl_rts' ), true ); ?>><label for="go_recent_tweets_incl_rts_y"><?php _e( 'Yes', 'go-recent-tweets' ); ?></label><br />
-							<input type="radio" name="go_recent_tweets_incl_rts" id="go_recent_tweets_incl_rts_n" value="0" <?php checked( 0, get_option( 'go_recent_tweets_incl_rts' ), true ); ?>><label for="go_recent_tweets_incl_rts_n"><?php _e( 'No', 'go-recent-tweets' ); ?></label>
+							<label><input type="radio" name="go_recent_tweets_settings[incl_rts]" value="1" <?php checked( 1, $options['incl_rts'] ); ?>> <?php _e( 'Yes', 'go-recent-tweets' ); ?></label><br />
+							<label><input type="radio" name="go_recent_tweets_settings[incl_rts]" value="0" <?php checked( 0, $options['incl_rts'] ); ?>> <?php _e( 'No', 'go-recent-tweets' ); ?></label>
 						</td>
 					</tr>
 				</table>
 				<p class="submit">
-					<?php submit_button( __( 'Save Settings', 'go-recent-tweets' ), 'primary', 'submit', false ); ?>
-					<input type="button" name="go_recent_tweets_clear_cache" id="go_recent_tweets_clear_cache" class="button" value="<?php _e( 'Clear Cache', 'go-recent-tweets' ); ?>" />
+					<?php submit_button( __( 'Save Changes', 'go-recent-tweets' ), 'primary', 'submit', false ); ?>
+					<input type="button" id="go-recent-tweets-clear-cache" class="button" value="<?php _e( 'Clear Cache', 'go-recent-tweets' ); ?>" />
 				</p>
 			</form>
 		</div>
@@ -279,33 +331,39 @@ class GO_Recent_Tweets {
 	 * Updates the list of tweets by calling the Twitter API.
 	 *
 	 * @since 0.1.0
+	 * @return array|false An array of recent tweets or false on failure.
 	 */
 	public static function load_tweets() {
 		require_once dirname( __FILE__ ) . '/vendor/twitter-api-php/TwitterAPIExchange.php';
-		/*
-		 * Gets Twitter API settings.
-		 */
-		$settings = array(
-			'oauth_access_token' => get_option( 'go_recent_tweets_api_oauth_access_token' ),
-			'oauth_access_token_secret' => get_option( 'go_recent_tweets_api_oauth_access_token_secret' ),
-			'consumer_key' => get_option( 'go_recent_tweets_api_consumer_key' ),
-			'consumer_secret' => get_option( 'go_recent_tweets_api_consumer_secret' ),
-		);
+		$options = get_option( 'go_recent_tweets_settings', false );
 
-		$twitter_username = urlencode( get_option( 'go_recent_tweets_username' ) );
-		$max_no = (int) get_option( 'go_recent_tweets_max_no' );
-		$incl_rts = (int) get_option( 'go_recent_tweets_incl_rts' );
-		$num_tweets = $max_no + 10; // So as to grab a couple extra.
+		if ( ! $options ) {
+			// If this method gets called before any settings were ever saved.
+			$options = array(
+				'api_oauth_access_token' => '',
+				'api_oauth_access_token_secret' => '',
+				'api_consumer_key' => '',
+				'api_consumer_secret' => '',
+				'username' => '',
+				'max_no' => 10,
+				'incl_rts' => '1',
+			);
+		}
+
+		$api_settings = array(
+			'oauth_access_token' => $options['api_oauth_access_token'],
+			'oauth_access_token_secret' => $options['api_oauth_access_token_secret'],
+			'consumer_key' => $options['api_consumer_key'],
+			'consumer_secret' => $options['api_consumer_secret'],
+		);
+		$num_tweets = (int) $options['max_no'] + 10; // So as to grab a couple extra.
 
 		$url = 'https://api.twitter.com/1.1/statuses/user_timeline.json';
-		$getfield = '?screen_name=' . $twitter_username . '&count=' . $num_tweets . '&include_rts=' . $incl_rts;
+		$getfield = '?screen_name=' . urlencode( $options['username'] ) . '&count=' . (string) $num_tweets . '&include_rts=' . $options['incl_rts'];
 		$requestMethod = 'GET';
 
-		$twitter = new TwitterAPIExchange( $settings );
-		$response = $twitter->setGetfield( $getfield )
-		                    ->buildOauth( $url, $requestMethod )
-		                    ->performRequest();
-		
+		$twitter = new TwitterAPIExchange( $api_settings );
+		$response = $twitter->setGetfield( $getfield )->buildOauth( $url, $requestMethod )->performRequest();
 		$json = @json_decode( $response, true );
 
 		if ( is_array( $json ) && ! isset( $json['errors'] ) ) {
@@ -319,13 +377,13 @@ class GO_Recent_Tweets {
 						'uri' => 'https://twitter.com/' . $tweet['user']['screen_name'] . '/status/' . $tweet['id_str'],
 					);
 
-					if ( count( $tweets ) >= $max_no ) {
+					if ( count( $tweets ) >= (int) $options['max_no'] ) {
 						break; // Break out of the loop.
 					}
 				}
 			}
 
-			set_transient( 'go_recent_tweets', $tweets, 12 * HOUR_IN_SECONDS ); // Store for 12 hours
+			set_transient( 'go_recent_tweets', $tweets, 12 * HOUR_IN_SECONDS ); // Store for 12 hours.
 
 			return $tweets;
 		}
@@ -353,6 +411,7 @@ class GO_Recent_Tweets {
 	 * debugging is enabled.
 	 *
 	 * @since 0.1.0
+	 * @param string $message The (error) message to be logged.
 	 */
 	public function error_log( $message ) {
 		if ( true === WP_DEBUG_LOG ) {

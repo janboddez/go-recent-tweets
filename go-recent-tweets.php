@@ -130,7 +130,7 @@ class GO_Recent_Tweets_Widget extends WP_Widget {
 	 * @param string $text Text that may or may not contain Twitter handles and URLS.
 	 * @return string Text containing actual HTML hyperlinks, if applicable.
 	 */
-	public function make_links_clickable( $text = '', $new_tab = true ) {
+	private function make_links_clickable( $text = '', $new_tab = true ) {
 		$text = wptexturize( $text );
 		$text = preg_replace( '/(^|[^a-z0-9_])@([a-z0-9_]+)/i', '$1<a href="https://twitter.com/$2" rel="nofollow">@$2</a>', $text );
 		$text = make_clickable( $text ); // Will add 'rel="nofollow"' by default.
@@ -407,8 +407,8 @@ class GO_Recent_Tweets {
 	}
 
 	/**
-	 * Logs error messages to the debug log file in the plugin folder, if WordPress
-	 * debugging is enabled.
+	 * Logs error messages to the debug log file in the plugin folder, but only
+	 * if WordPress debug logging is enabled.
 	 *
 	 * @since 0.1.0
 	 * @param string $message The (error) message to be logged.

@@ -1,7 +1,8 @@
 <?php
 /**
  * Plugin Name: GO Recent Tweets Widget
- * Plugin URI: https://janboddez.be/
+ * Plugin URI: https://github.com/janboddez/go-recent-tweets
+ * GitHub Plugin URI: https://github.com/janboddez/go-recent-tweets
  * Description: Retrieve, cache and display your most recent tweets.
  * Author: Jan Boddez
  * Author URI: https://janboddez.be/
